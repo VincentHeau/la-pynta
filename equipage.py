@@ -2,6 +2,9 @@ class Equipage(object):
     def __init__(self, marins):
         self.marins = marins
 
+    def afficheInfo(self):
+        for i in range(len(self.marins)):
+            print("Nom :",self.marins[i].nom,"\nArgent : ",self.marins[i].argent, "\nSalaire : ",self.marins[i].salaire, "\nSForce : ",self.marins[i].force)
     def calculDesRichesses(self):
         richesse = 0
         for p in self.marins:

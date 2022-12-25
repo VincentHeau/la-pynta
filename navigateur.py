@@ -60,10 +60,11 @@ class Navigateur(object):
 
 # You is - a Navigateur
 class Pirate(Navigateur):
-    def __init__(self,nom,victoires,experience=0):
-        super(Pirate, self).__init__(nom)
+    def __init__(self,nom,argent,victoires,experience=0):
+        super(Pirate, self).__init__(nom,argent=argent)
         self.victoires = victoires
         self.experience = experience
+
 
     def afficheInfo(self):
      print("Nom : ",self.nom)

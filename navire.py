@@ -1,9 +1,11 @@
 from equipage import Equipage
 
 class Navire(object):
-    def __init__(self, nom, marins):
+    def __init__(self, nom, marins, categorie):
         self.nom = nom
         self.equipage = Equipage(marins)
+        self.categorie = categorie
+
 
 
     def combat(self, ennemi):

@@ -14,7 +14,6 @@ print(jeux.__doc__)
 
 if __name__ == "__main__":
 
-
     """
     # Pour lister et choisir un port parmi tous les ports
                     ports = carthapirates.listerTousLesPorts()
@@ -46,47 +45,48 @@ if __name__ == "__main__":
         print(colorer("Et bha le bateau et ses trajets ont quand même été retirés. Na ! Regardez la carte !", "vert"))
     """
 
-
-
-    #Initialisation des paramètres de départ du jeu
+    # Initialisation des paramètres de départ du jeu
     fin = False
     carthapirates = CarthaPirates(7)  # Numero du bateau LaPynta
-    carthapirates.rentrerMonBateau() # Nettoyge préliminaire
+    carthapirates.rentrerMonBateau()  # Nettoyge préliminaire
 
-    navireLaPynta = 'Chaloupe'
-    E= None #Equipage
+    LoupsDeMer = Taverne(listeNom, listePrenom)  # taverne
+    navireLaPynta = 'Chaloupe'  # navire
+    E = None  # Equipage
 
     # menu du jeu
     menu = colorer("""     A. Partir à la recherche du trésor
      B. Aller à la Taverne
-     C. Lancer une attaque
-     D. Quitter la piraterie""","vert")
-    #pendu(jeux.liste_mot)
+     C. Acheter un bateau
+     D. Lancer une attaque
+     E. Quitter la piraterie""", "vert")
+    # pendu(jeux.liste_mot)
     print("Bienvenue jeune pirate !")
     barre_chargement(0.01)
     # 1** Choix du nom du capitaine
     Nom = input("Choisis ton nom : ")
-    joueur = Pirate(Nom,0,experience=0)
+    joueur = Pirate(Nom, argent=5, victoires=0, experience=2)
 
-
-    print("Alors comme ça tu te lances dans la piraterie ",Nom," ! Résumons un peu... ")
+    print("Alors comme ça tu te lances dans la piraterie ", Nom, " ! Résumons un peu... ")
     joueur.afficheInfo()
     print('')
 
     while not fin:
 
-        barre_chargement(0.01,mot=colorer(" MENU ","rouge"))
+        barre_chargement(0.01, mot=colorer(" MENU ", "rouge"))
         print(menu)
-        MODE=input('A toi de choisir A,B,C ou D : ')
-        MODE=MODE.upper()
+        MODE = input('A toi de choisir A,B,C,D ou E : ')
+        MODE = MODE.upper()
         print('')
 
         if MODE == 'A':
-            if navireLaPynta == None:# or E == None:
-               print('Il sera difficile de commencer la chance au trésor sans navire ou sans équipage, retourne à la Taverne.')
+            if navireLaPynta == None:  # or E == None:
+                print(
+                    'Il sera difficile de commencer la chance au trésor sans navire ou sans équipage, retourne à la Taverne.')
             elif navireLaPynta == 'Chaloupe':
-                abandon = input("Avec une embarcation aussi maigre, l'aventure sera rude !\n Veux-tu abandonner [Oui/Non] ?")
-                abandon=abandon.lower()
+                abandon = input(
+                    "Avec une embarcation aussi maigre, l'aventure sera rude !\n Veux-tu abandonner [Oui/Non] ?")
+                abandon = abandon.lower()
 
                 if abandon == "non":
                     print("Que l'aventure commence, ouvre la page web https://carthapirates.fr/ pour voir la carte !!")
@@ -95,10 +95,20 @@ if __name__ == "__main__":
                     lat = 39.5
                     carthapirates.deplacerMonBateauVersCoords((12.4, 39.5))
                     print("Prouve à ton équipage que tu es un bon marin :")
-                    print("Regarde la carte et évalue les coordonnées géographiques en longitude et latitude du navire.")
+                    print(
+                        "Regarde la carte et évalue les coordonnées géographiques en longitude et latitude du navire.")
                     print("Tu dois te tromper de moins de 100km et tu as 8 tentatives ")
-                    test1 = devine_les_coords(lat,long,8)
+                    test1 = devine_les_coords(lat, long, 8)
+
                     if test1:
+                        input("Sans indice ni argent, il faut retourner à terre, c'est ok ? [Tape une touche]")
+                        print(
+                            colorer("Attention, il y a plus d'argent à piller dans certains ports que dans d'autres, !",
+                                    "rouge"))
+                        ports = carthapirates.listerTousLesPorts()
+                        for port in ports:
+                            print(port["id"], ":", port["nom"])
+                        idPortChoisi = input(colorer("Dans quel port souhaitez-vous aller maintenant ? ", "rouge"))
                         # Pour déplacer le bateau vers des coordonnées
                         # carthapirates.deplacerMonBateauVersCoords(coords)  # On réutilise les coordonnées du port choisi
                         print(colorer("Le bateau a bien été déplacé. Regardez la carte !", "vert"))
@@ -108,7 +118,7 @@ if __name__ == "__main__":
 
 
             elif navireLaPynta == 'Navire':
-                #print(embarcations[navireLaPynta])
+                # print(embarcations[navireLaPynta])
                 print("Que l'aventure commence, ouvre la page web https://carthapirates.fr/ pour voir la carte !!")
 
                 long = 12.4
@@ -121,24 +131,68 @@ if __name__ == "__main__":
             elif navireLaPynta == 'Caravelle':
                 print(embarcations[navireLaPynta])
         elif MODE == 'B':
-            pass
+            biere = input("Un p'tit whisky ? [Oui/Non] ")
+            biere = biere.lower()
+            if biere == "oui":
+                if joueur.argent < 5:
+                    print("Tonerre de Brest, tu vas pas nous payer tu n'as que", joueur.argent, "pièces d'or")
+                    print(
+                        "Le whisky coûte 5 pièces d'or alors vends ton bateau si tu en as un, ou quitte la piraterie, personne ne veux de toi ici !")
+                else:
+                    print("Ca fera 5 pièces d'or")
+                    joueur.argent = joueur.argent - 5
+                    input("Il te reste " + str(joueur.argent) + " pièces d'or [Tapez ENTREE]")
+                    print("Qu'est -ce qui t'amène ici ?")
+                    print("A. Débaucher un équipage")
+                    print("B. Juste pour boire du whisky")
+                    choixTaverne = input("[Tape A ou B] ")
+                    choixTaverne=choixTaverne.upper()
+                    if choixTaverne == 'A':
+                        liste_equipage = []
+                        for i in range(5):
+                            liste_equipage.append(LoupsDeMer.debaucher(experience=joueur.experience))
+                        # constitution de l'équipage
+                        E = Equipage(liste_equipage)
+                        E.afficheInfo()
+                    elif choixTaverne == 'B':
+                        nbWhisky = 0
+                        while joueur.argent >= 5:
+                            nbWhisky += 1
+                            joueur.argent = joueur.argent - 5
+                        print(colorer("Ivrogne, tu n'as plus un sou, dehors ! ", "rouge"))
+                    else:
+                        input(
+                            "Tu es déjà bien saoul ma parole, sors de là avant de faire n'importe quoi ! [Tapez ENTREE]")
+
+            else:
+                print("Mille millions de mille sabords, sors de là Moule à gaufres si tu ne bois pas de whisky")
+
         elif MODE == 'C':
-            pass
+            if navireLaPynta == None or E == None:
+                input("Pas de d'équipage, pas de bateau \n pas de bateau pas d'attaque [Tapez ENTREE]")
+            else:
+                pass
+
         elif MODE == 'D':
-            #on juge le pirate et on le condamne
+
+            pass
+        elif MODE == 'E':
+            # on juge le pirate et on le condamne
             if joueur.experience == 0:
-                print("Tu t'en sors bien moussaillon, tu n'as encore rien fait de grave, retourne faire un métier honnête\nTu n'es pas fait pour la piraterie de toute façon !")
+                print(
+                    "Tu t'en sors bien moussaillon, tu n'as encore rien fait de grave, retourne faire un métier honnête\nTu n'es pas fait pour la piraterie de toute façon !")
                 fin = True
             if joueur.experience == 1:
                 # amende payée, fin, retour dans la piraterie
                 print("Tu ne vas pas t'en sortir comme ça ! La justice te condamne à une amende de 180 pièces d'or")
-                print("A. Accepter le jugement (Ton butin est de ",joueur.argent," pièces d'or.)")
+                print("A. Accepter le jugement (Ton butin est de ", joueur.argent, " pièces d'or.)")
                 print("B. Echapper à la justice et tenter à nouveau sa chance dans la piraterie ")
-                choixModeD=input("Alors que fais-tu A ou B ? ")
+                choixModeD = input("Alors que fais-tu A ou B ? ")
                 if choixModeD == "A":
-                    if joueur.argent>=180:
-                        joueur.argent = joueur.argent-180
-                        choixModeD_revenir = input("Tu en a fini avec la justice, Veux revenir dans la piraterie ou abandonner à jamais tel un lâche ? [Oui/Non]")
+                    if joueur.argent >= 180:
+                        joueur.argent = joueur.argent - 180
+                        choixModeD_revenir = input(
+                            "Tu en a fini avec la justice, Veux revenir dans la piraterie ou abandonner à jamais tel un lâche ? [Oui/Non]")
                         choixModeD_revenir = choixModeD_revenir.upper()
                         if choixModeD_revenir == "NON":
                             print('Aurevoir,en espérant te revoir bientôt dans la piraterie !')
@@ -148,7 +202,8 @@ if __name__ == "__main__":
                         else:
                             print('Je ne comprends pas ta réponse mais je prends ça pour un oui')
                     else:
-                        print("Tu ne peux pas payer l'amende, la justice décide donc de te condamner à mort. \nUne dernière chance de t'échapper, retrouve le code secret du cadenas de la prison et échappe toi !")
+                        print(
+                            "Tu ne peux pas payer l'amende, la justice décide donc de te condamner à mort. \nUne dernière chance de t'échapper, retrouve le code secret du cadenas de la prison et échappe toi !")
                         destin = pendu(jeux.liste_mot)
                         if destin:
                             print('')
@@ -160,7 +215,8 @@ if __name__ == "__main__":
                 elif choixModeD == 'B':
                     print("Sage décision pirate ;)")
                 else:
-                    print("On ne t'a pas compris ! Tu étais trop occupé à t'enfuir c'est pour ça ....\n Petit coquin, bienvenue à toi")
+                    print(
+                        "On ne t'a pas compris ! Tu étais trop occupé à t'enfuir c'est pour ça ....\n Petit coquin, bienvenue à toi")
 
             if joueur.experience == 2:
                 # jeu du pendu pour revenir au menu ou mort du personnage
@@ -173,15 +229,15 @@ if __name__ == "__main__":
                     print('Bienvenue dans la piraterie vieux loup de mer, retente ta chance !')
                 else:
                     print("Les gens se rappelleront de toi", joueur.nom, "\nAurevoir")
-                    fin =True
+                    fin = True
         else:
             print("Tape A,B,C ou D, pas autre chose enfin !")
 
         # Choix de l'équipage
-        #nomDePirate = ["Bonny", "Jack", "Teach", "Drake", "Morgan", "Nau", "Read"]
-        #prenomDePirate = ["Anne", "Calico", "Edward", "Francis", "Henry", "Jean", "Mary"]
-        #taverneAPirate = Taverne(nomDePirate, prenomDePirate)
-        #E = Equipage(buildEquipage(taverneAPirate, 5))
+        # nomDePirate = ["Bonny", "Jack", "Teach", "Drake", "Morgan", "Nau", "Read"]
+        # prenomDePirate = ["Anne", "Calico", "Edward", "Francis", "Henry", "Jean", "Mary"]
+        # taverneAPirate = Taverne(nomDePirate, prenomDePirate)
+        # E = Equipage(buildEquipage(taverneAPirate, 5))
 
         """
         print(" A la taverne, vous débauchez une belle brochette de rigolos")
@@ -264,7 +320,3 @@ if __name__ == "__main__":
         """
 
     print("Jeu LaPynta2023")
-
-
-
-
