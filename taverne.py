@@ -1,5 +1,7 @@
+"""
+Classe Taverne
+"""
 import random as rd
-
 from navigateur import Navigateur
 
 class Taverne(object):

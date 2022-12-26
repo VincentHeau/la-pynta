@@ -1,3 +1,7 @@
+"""
+Classe CarthaPirates pour l'interaction avec la carte
+"""
+
 import os
 import requests
 

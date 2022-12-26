@@ -1,3 +1,7 @@
+"""
+Classe Navire
+"""
+
 from equipage import Equipage
 
 class Navire(object):

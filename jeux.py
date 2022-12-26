@@ -3,12 +3,12 @@ Ce module contient l'ensemble des mini-jeux utilisés dans le jeu principal,
 ainsi que les données qui servent à alimenter ces jeux.
 """
 import random as rd
-import time
-import sys
-from math import sin, cos, acos, pi
-import carthaPirates
-from navigateur import Navigateur
 import string
+import sys
+import time
+from math import sin, cos, acos, pi
+
+
 
 #### DATA ####
 
@@ -25,7 +25,7 @@ for i in data:
     else:
         mot = mot + i
 
-# 2. Table des exceptions à prendre en compte dans la liste de mots français
+# 2. Table des exceptions à prendre en compte dans la liste de mots français (pour le jeu du pendu)
 exceptions = {'éèêẽ': 'e',
               'ç': 'c',
               'àâã': 'a',
@@ -132,7 +132,7 @@ embarcations = {'Chaloupe': r"""
    _______________________________________/
       \         La Pynta (yawl)        _/
        \_____________________________/
-
+            ### 5 pièces d'or ###
 """,
                 'Navire': r"""
                                   |
@@ -149,7 +149,7 @@ embarcations = {'Chaloupe': r"""
             _____________________|_________________/
                \  *        La Pynta (Vessel)     _/
                 \_______________________________/
-
+                       ### 40 pièces d'or ###
                 """,
                 'Caravelle': r"""
                 |
@@ -167,15 +167,25 @@ embarcations = {'Chaloupe': r"""
     ____________|______________________|__________
      \_  µ           HMS La Pynta              _/
        \______________________________________/
-
+                  ### 150 pièces d'or ###
 """
                 }
 
-# 4. Création du dictionnaire du butin à voler dans les ports
-butinPort={1:300,2:300,3:300,4:300,5:300,6:300,7:300,8:300,9:300,10:300,11:300,12:300,13:300,14:300,15:300,16:300,
-           17:300,18:300,19:300,20:300,}
+# 4. Création des messages de victoire et de Défaite pour le trésor
+vict = """
+╔══════════════════╗
+║     VICTOIRE     ║
+║ 500 pièces d'or  ║ 
+╚══════════════════╝
+"""
 
-# 5 . Création des listes de Noms et de Prénoms pour la Taverne
+defa = """
+╔══════════════════╗
+║     DÉFAITE      ║
+║    Tu es ruiné   ║ 
+╚══════════════════╝
+"""
+# 5 . Création des listes de Noms et de Prénoms pour la Taverne (pardon pour les noms !! )
 listeNom = ["Zanin","Mustière","Ribardière","Van Hamme","Boulier","Cura","Commenges","Fritsch","Payet","Gautier"]
 listePrenom = ["Christine","Sébastien","Antonine","Adrien","Joel","Robin","Hadrien","Emmanuel","Nicolas","Jacques"]
 
@@ -184,54 +194,63 @@ listePrenom = ["Christine","Sébastien","Antonine","Adrien","Joel","Robin","Hadr
 # utile dans le cas de la bataille navale
 alphabet = dict(zip([i+1 for i in range(26)],string.ascii_uppercase ))
 
-#### FONCTIONS ####
 
+
+#### FONCTIONS ####
 def get_key(val,dictionnaire):
+    """
+    Permet d'obtenir la clé en ayant une valeur d'un dictionnaire
+    :param val:
+    Valeur dans le dictionnaire
+    :param dictionnaire: dict
+    Dictionnaire dans lequel on fait la recherche
+    :return: key
+    La clé qui correspond à la valeur
+    """
     for key, value in dictionnaire.items():
         if val == value:
             return key
     return "La clé n'existe pas"
 
-#print(get_key('A',alphabet))
-
-def dms2dd(d, m, s):
-    """Convertit un angle "degrés minutes secondes" en "degrés décimaux"
-    """
-    return d + m / 60 + s / 3600
-
-
-
-def dd2dms(dd):
-    """Convertit un angle "degrés décimaux" en "degrés minutes secondes"
-    """
-    d = int(dd)
-    x = (dd - d) * 60
-    m = int(x)
-    s = (x - m) * 60
-    return d, m, s
 
 def deg2rad(dd):
-    """Convertit un angle "degrés décimaux" en "radians"
+    """
+    Convertit un angle "degrés décimaux" en "radians"
+    :param dd: float
+    :return: float
     """
     return dd / 180 * pi
-
-
 def rad2deg(rd):
-    """Convertit un angle "radians" en "degrés décimaux"
+    """
+    Convertit un angle "radians" en "degrés décimaux"
+    :param rd: float
+    :return: float
     """
     return rd / pi * 180
 
-
-def distanceGPS(latA, longA, latB, longB):
-    """Retourne la distance en mètres entre les 2 points A et B connus grâce à
-       leurs coordonnées GPS (en radians).
+def distanceGPS(latitude1, longitude1, latitude2, longitude2, unit='kilometers'):
     """
-    # Rayon de la terre en mètres (sphère IAG-GRS80)
-    RT = 6378 #en km
-    # angle en radians entre les 2 points
-    S = acos(sin(latA) * sin(latB) + cos(latA) * cos(latB) * cos(abs(longB - longA)))
-    # distance entre les 2 points, comptée sur un arc de grand cercle
-    return round(S * RT)
+    Fonction de calcul d'une distance sur la Terre issu de la source suivante :
+    https://fr.martech.zone/calculate-great-circle-distance/
+
+    :param latitude1:
+    :param longitude1:
+    :param latitude2:
+    :param longitude2:
+    :param unit:
+    :return:
+    """
+    theta = longitude1 - longitude2
+    distance = 60 * 1.1515 * rad2deg(
+        acos(
+            (sin(deg2rad(latitude1)) * sin(deg2rad(latitude2))) +
+            (cos(deg2rad(latitude1)) * cos(deg2rad(latitude2)) * cos(deg2rad(theta)))
+        )
+    )
+    if unit == 'miles':
+        return round(distance, 2)
+    if unit == 'kilometers':
+        return round(distance * 1.609344, 2)
 def colorer(message, couleur):
     """
     Fonction issue du fichier exemple.py enrichi avec la couleur jaune
@@ -242,23 +261,21 @@ def colorer(message, couleur):
     couleurs = {"vert": "\033[92m","grisclair": "\033[37m","bleu": "\033[34m","jaune":'\033[93m', "rouge": "\033[91m", "normal": "\033[0m"}
     return couleurs[couleur] + message + couleurs["normal"]
 
-def remplace(mot):
-    mot_remplace = ''
-    for lettre in mot:
-        for ex in exceptions:
-            if lettre in ex:
-                lettre = exceptions[ex]
-                break
-        mot_remplace += lettre
-    return mot_remplace
-
-
-# Test unitaire pour vérifier que la fonction de remplacement marche bien
-# print(remplace("illétrédzàçœ"))
-
-
-def barre_chargement(tps=0.1, icone=colorer("■","rouge"), mot=""):
-    toolbar_width = 20
+def barre_chargement(tps=0.1, icone=colorer("■","rouge"), mot="",longueur=20):
+    """
+    Permet de faire une barre de chargement dans la console
+    :param tps: float
+    Temps de chargement
+    :param icone: str
+    Les icônes de chargement
+    :param mot: string
+    Si on veut mettre un mot au milieu
+    :param longueur: int
+    La longueur de la barre
+    :return: string
+    La barre de chargement
+    """
+    toolbar_width = longueur
     for i in range(toolbar_width):
         time.sleep(tps)
         # avancement de la barre
@@ -270,70 +287,21 @@ def barre_chargement(tps=0.1, icone=colorer("■","rouge"), mot=""):
 
     sys.stdout.write("\n")
 
-
-def devine_les_coords(LatAtrouver,LongAtrouver, tour = 8):
+## Jeu pierre-papier-ciseaux
+# Inutile pour le moment
+def pierre_papier_ciseaux(x):
     """
-    :param nombreATrouver:
-    :return:
+    Jeu pierre papier ciseaux
+    :param x: int
+    En combien
+    :return: None
     """
 
-    n=0
-    while n <= tour:
-        n+=1
-        Lat = input("Tape la latitude : ")
-        Long = input("Tape la longitude : ")
-
-
-        try:
-            Lat, Long = float(Lat), float(Long)
-            dist = distanceGPS(LatAtrouver, LongAtrouver, Lat, Long)
-            if dist<=100:
-                print("Bravo, tu es à moins de 100km !")
-                print("Coordonnées réelles : (",LatAtrouver,",",LongAtrouver,")")
-                return True
-            else:
-                if dist>=1000:
-                    print("Oulala, ça part mal, tu te trompes de ",dist,"km")
-                else:
-                    print("Rapproche toi encore, tu es à ", dist,"km")
-        except:
-            print("Entre de vraies coordonnées géographiques en dégrés décimaux marin d'eau douce !")
-    return False
-
-
-def devine_la_dist(idPort,LatB,LongB,tour = 8):
-
-    coords = carthaPirates.recupererCoordsPort(idPort)  # On réutilise l'identifiant du port choisi
-    distance_bateau_port=distanceGPS(coords[1],coords[0],LatB,LongB)
-    n = 0
-    while n <= tour:
-        n += 1
-        D = input("Estime la distance en km : ")
-
-        try:
-            D = int(D)
-            if distance_bateau_port <= 10:
-                print("Bravo, tu es à moins de 10km !")
-                print("Distance réelle : ", distance_bateau_port)
-                return True
-            else:
-                if distance_bateau_port >= 100:
-                    print("Oulala, tu es encore loin !")
-                else:
-                    print("Tu t'approches !")
-        except:
-            print("Entre une vraie distance en km marin d'eau douce !")
-
-
-def match(x):
-    """
-    :return:
-    """
     scoreJoueur = 0
     scoreOrdi = 0
     dict = {"pierre": 0, "papier": 1, "ciseaux": 2}
     i = 0
-    SO, SA, X = []
+    SO, SA, X = [],[],[]
 
     while ((scoreJoueur < x and scoreOrdi < x)):
         choixJoueur = input('Tapez "pierre", "papier" ou "ciseaux" : ')
@@ -371,25 +339,27 @@ def match(x):
         print("L'ordi a gagné")
 
 
-def dedoublonner():
-    tailleTab = int(input("Veuillez saisir une taille de tableau : "))
-    tab = []
-    tabSDoublon = []
+## Jeu du pendu
+def remplace(mot):
+    """
+    Nettoie un mot en enlevant les lettres avec accent ou lettres particulières
+    :param mot: str
+    Le mot non nettoyé
+    :return: str
+    Le mot nettoyé
+    """
+    mot_remplace = ''
+    for lettre in mot:
+        for ex in exceptions:
+            if lettre in ex:
+                lettre = exceptions[ex]
+                break
+        mot_remplace += lettre
+    return mot_remplace
 
-    for i in range(0, tailleTab):
-        saisieUtilisateur = int(input("Saisir une valeur : "))
-        tab.append(saisieUtilisateur)
 
-    # Fonction qui renvoie un tableau trié
-    tab.sort()
-    tabSDoublon.append(tab[0])
-
-    for i in range(1, tailleTab):
-        if tab[i - 1] != tab[i]:
-            tabSDoublon.append(tab[i])
-
-    return (tabSDoublon)
-
+# Test unitaire pour vérifier que la fonction de remplacement marche bien
+# print(remplace("illétrédzàçœ"))
 
 def affichage(liste):
     """
@@ -406,12 +376,13 @@ def affichage(liste):
             str += lettre.upper()
             str += ' '
     return (str)
-
-
 def pendu(liste, mot_precis=None):
     """
-    :param liste:
+    Jeu du pendu, possibilité de jouer avec un mot au hasard d'une liste en français, ou possibilité de chosir le mot
+    :param liste: list
+    Une liste de mot français
     :param mot_precis:
+    Le mot à faire deviner
     :return: Booléen
     True en cas de victoire et False en cas de défaite
     """
@@ -465,36 +436,94 @@ def pendu(liste, mot_precis=None):
     print("Bravo tu es super fort")
     return True
 
-
-def transform():
+## Jeux devinettes
+def devine_les_coords(LatAtrouver,LongAtrouver, tour = 8):
+    """
+    Deviner une latitude et une longitude (être à moins de 10 km
+    :param LatAtrouver: float
+    La latitude recherchée
+    :param LongAtrouver: float
+    La longitude recherchée
+    :param tour: int
+    En combien de coups
+    :return: boolean
+    Victoire ou pas
     """
 
-    :param tableau:
-    :return:
+    n=0
+    while n <= tour:
+        n+=1
+        Lat = input("Tape la latitude : ")
+        Long = input("Tape la longitude : ")
+
+
+        try:
+            Lat, Long = float(Lat), float(Long)
+            dist = distanceGPS(LatAtrouver, LongAtrouver, Lat, Long)
+            if dist<=100:
+                print("Bravo, tu es à moins de 100km !")
+                print("Coordonnées réelles : (",LatAtrouver,",",LongAtrouver,")")
+                return True
+            else:
+                if dist>=1000:
+                    print("Oulala, ça part mal, tu te trompes de ",dist,"km")
+                else:
+                    print("Rapproche toi encore, tu es à ", dist,"km")
+        except:
+            print("Entre de vraies coordonnées géographiques en dégrés décimaux marin d'eau douce !")
+    return False
+
+def devine_la_dist(coords,LatB,LongB,tour = 8):
     """
-    tab = []
-    for numligne in range(4):
-        ligne = []
-        for numcolonne in range(4):
-            ligne.append(1)
-        tab.append(ligne)
+    Deviner la distance du bateau à un port bien précisé par ses coordonnées
+    :param coords: list
+    Liste des coordonnées d'un point (le port)
+    :param LatB: float
+    La latitude du bateau
+    :param LongB: float
+    La longitude du bateau
+    :param tour: int
+    En combien de coups
+    :return: boolean
+    Victoire ou pas
+    """
+    distance_bateau_port=distanceGPS(coords[1],coords[0],LatB,LongB)
+    n = 0
+    while n <= tour:
+        n += 1
+        D = input("Estime la distance en km : ")
 
-    nbTabL = len(tab)
-    nbTabC = len(tab[0])
+        try:
+            D = int(D)
+            if abs(D-distance_bateau_port) <= 10:
+                print(colorer("Bravo, tu es à moins de 10km !","vert"))
+                print("Distance réelle : ", distance_bateau_port)
+                print('')
+                return True
+            else:
+                if abs(D-distance_bateau_port) >= 100:
+                    print("Oulala, tu es encore loin !")
+                    if D > distance_bateau_port:
+                        print("Essaye beaucoup moins")
+                    else:
+                        print("Essaye beaucoup plus")
+                else:
+                    print("Tu t'approches !")
+        except:
+            print("Entre une vraie distance en km marin d'eau douce !")
 
-    for i in range(nbTabL):
-        for j in range(nbTabC):
-            if i == j:
-                tab[i][j] = tab[i][j] * 2
-            if ((i == 0) or (i == nbTabL - 1)):
-                tab[i][j] = tab[i][j] + 1
-            elif ((j == 0) or (j == nbTabC - 1)):
-                tab[i][j] = tab[i][j] + 1
 
-    print(tab)
-
-def affiche_cadrillage(liste,type = 0):
-    """Affichage de la grille"""
+## Bataille Navale
+def affiche_quadrillage(liste,type = 0):
+    """
+    Affichage de la grille dans la console
+    :param liste: list
+    La liste qui correspond au plateau de jeu
+    :param type: int
+    Entier qui permet de changer la couleur si on veut afficher la grille du joueur ou de l'adversaire
+    :return: str
+    Le plateau
+    """
     carte = ''
     ligne_finale='  '
     for i in range(len(liste)):
@@ -518,8 +547,10 @@ def conv_pos(pos):
     """
     Convertisseur d'une postition, par exemple 'A2' sous la forme de coordonnées du tableau python
     ex/ 'A2' sera converti en [1,0] car 'A2' et la case du tableau t tel que 'A2' = T[1][0]
-    :param pos:
-    :return:
+    :param pos:str
+    Une position littérale par exemple 'A2'
+    :return: list
+    Une position comprise par Python par exemple [1,0]
     """
     tab_coords=[]
     tab_coords.append(int(pos[1::])-1)
@@ -527,18 +558,87 @@ def conv_pos(pos):
     return tab_coords
 
 def conv_coords(tab_coords):
+    """
+    Convertisseur de coordonnées du tableau python, par exemple [1,0] sous la forme d'une postition
+    ex/ [1,0] sera converti en 'A2' car 'A2' et la case du tableau t tel que 'A2' = T[1][0]
+    :param tab_coords:list
+    Une position comprise par Python par exemple [1,0]
+    :return: str
+    Une position littérale par exemple 'A2'
+
+    """
     pos=''
-    pos+=alphabet[tab_coords[1]]
+    pos+=alphabet[tab_coords[1]+1]
     pos+=str(tab_coords[0]+1)
     return pos
 
 def detection(grille):
+    """
+    Renvoie False si Coulé
+    :param grille: list
+    plateau de jeu python
+    :return: boolean
+    True s'il reste des parties à couler, False sinon
+    """
     for i in range(len(grille)):
         for j in range(len(grille)):
             if grille[i][j]==100:
                 return True
     return False
+
+def intelligence_ordi(liste,case,tailleJoueur,x):
+    """
+    Un fois touché, l'ordi ne doit viser que les cases sur lesquels le bateau peut se situer
+    Ce programme prend la liste de l'ensemble des possibilités de tire et la restreint aux cases possibles
+
+    :param liste: list
+    Liste des cases qu'il reste à l'ordi pour tirer un missile
+    :param case: string
+    La case qui a été touchée à partir de laquelle il faut raisonner
+    :param tailleJoueur: int
+    La taille du bateau du joueur pour savoir où chercher autour
+    :param x: int
+    la taille du plateau
+    :return: list
+    La liste restreinte aux seules possibilités maintenant
+    """
+    # 1. On trouve les coordonnées de la case où se trouve une partie du bateau
+    coords = conv_pos(case)
+
+    # 2. On fait une liste en croix des cases où le bateau peut se trouver
+    croix=[]
+    for i in range(-tailleJoueur+1,tailleJoueur):
+        for j in range(-tailleJoueur+1,tailleJoueur):
+            if i*j == 0 and i!=j: # condition qui ne garde que les cases en dessous au au dessus (cases potentielles)
+                if coords[0]+i >= x or coords[0]+i < 0 or coords[1]+j >= x or coords[1]+j < 0:
+                    # la case est en dehors de la grille
+                    pass
+                else:
+                    case_possible = conv_coords([coords[0]+i,coords[1]+j])
+                    croix.append(case_possible)
+
+    # 3. On élimine les cases de cette croix qui ont déjà été testées
+    croix_nettoye=[]
+    for position in croix:
+        if position in liste:
+            croix_nettoye.append(position)
+
+    return croix_nettoye
+
+
+
 def bataille_navale(x, tailleJoueur,tailleOrdi):
+    """
+    Jeu de la bataille Navale
+    :param x: int
+    Taille du plateau qui est carré
+    :param tailleJoueur: int
+    Taille du bateau du joueur
+    :param tailleOrdi: int
+    Taille du bateau de l'ordi
+    :return: bool
+    True en cas de victoire, False en cas de défaite
+    """
 
     # 1. Initialisation des grilles joueur et Ordi
     print(f"Bienvenue dans la bataille navale sur un plateau ({x},{x})")
@@ -547,9 +647,18 @@ def bataille_navale(x, tailleJoueur,tailleOrdi):
     grilleJ1 = [[0 for i in range(x)] for j in range(x)]
     grilleOrdi = [[0 for i in range(x)] for j in range(x)]
 
+    ## Création d'une liste de l'ensemble des positions possibles dans la grille
+    ## Cette liste sera utilisée pour éviter à l'ordi de taper 2 fois au même endroit
+    cases_possibles=[]
+    for i in range(x):
+        for j in range(x):
+            case = alphabet[i+1]+str(j+1)
+            cases_possibles.append(case)
+
+
     # 2. Placement des bateaux
     ## Placement du bateau du joueur
-    affiche_cadrillage(grilleJ1,1)
+    affiche_quadrillage(grilleJ1,1)
     print("Commence par positionner ton bateau sur le plateau.")
     sens = None
     if tailleJoueur > 1:
@@ -569,7 +678,7 @@ def bataille_navale(x, tailleJoueur,tailleOrdi):
                     print("Ne sors pas du plateau Ectoplasme !!!")
                 else:
                     if sens == 'V':
-                        if x-coords_proue[0] <=2 : #bateau placé trop bas
+                        if x-coords_proue[0] <2 : #bateau placé trop bas
                             print("Recommence, ici c'est pas possible")
                         else: #on place le bateau
                             grilleJ1[coords_proue[0]][coords_proue[1]] = 100
@@ -578,7 +687,7 @@ def bataille_navale(x, tailleJoueur,tailleOrdi):
                             test_proue = True
 
                     elif sens == 'H':
-                        if x-coords_proue[1] <=2: #bateau trop à droite
+                        if x-coords_proue[1] <2: #bateau trop à droite
                             print("Recommence, ici c'est pas possible")
                         else: #on place le bateau
                             grilleJ1[coords_proue[0]][coords_proue[1]] = 100
@@ -606,7 +715,7 @@ def bataille_navale(x, tailleJoueur,tailleOrdi):
     while not positionne:
         coords_proue_ordi = [rd.randint(0, tailleOrdi - 1), rd.randint(0, tailleOrdi - 1)]
         if sens == 'V':
-            if x - coords_proue_ordi[0] <= 2:  # bateau placé trop bas au hasard
+            if x - coords_proue_ordi[0] < 2:  # bateau placé trop bas au hasard
                 # Il faut recommencer le tirage au sort
                 pass
             else:  # on place le bateau
@@ -616,7 +725,7 @@ def bataille_navale(x, tailleJoueur,tailleOrdi):
                 positionne = True
 
         elif sens == 'H':
-            if x - coords_proue_ordi[1] <= 2:  # bateau placé trop à droite au hasard
+            if x - coords_proue_ordi[1] < 2:  # bateau placé trop à droite au hasard
                 # Il faut recommencer le tirage au sort
                 pass
             else:  # on place le bateau
@@ -628,10 +737,10 @@ def bataille_navale(x, tailleJoueur,tailleOrdi):
             grilleOrdi[coords_proue_ordi[0]][coords_proue_ordi[1]] = 100
             positionne = True
 
-    affiche_cadrillage(grilleJ1,1)
+    affiche_quadrillage(grilleJ1,1)
     print("Grille du joueur")
 
-    affiche_cadrillage(grilleOrdi)
+    affiche_quadrillage(grilleOrdi)
     print("Grille de l'ordi")
 
 
@@ -650,33 +759,52 @@ def bataille_navale(x, tailleJoueur,tailleOrdi):
                 except ValueError:
                     print("Tu ne tapes pas une case valide")
                     print("Tape quelque chose du type 'a2' ou 'D9', c'est pas compliqué bachi-bouzouks!")
-
-            if grilleOrdi[missile[0]][missile[1]] == 0:
-                print("Plouf, dans la mer")
-                Tour = not Tour
-            elif grilleOrdi[missile[0]][missile[1]] == 100:
-                print(colorer("Touché","vert"))
-                grilleOrdi[missile[0]][missile[1]] = 50
+            # On vérifie que la case choisie est bien dans le plateau
+            if coords_missile[0] >= x or coords_missile[0] < 0 or coords_missile[1] >= x or coords_missile[1] < 0:
+                print("Ne sors pas du plateau Ectoplasme !!!")
             else:
-                print("Tu as déjà tiré ici, tu perds la boule")
-            if not detection(grilleJ1):
-                pass
+                if grilleOrdi[coords_missile[0]][coords_missile[1]] == 0:
+                    print("Plouf, dans la mer")
+                    Tour = not Tour
+                elif grilleOrdi[coords_missile[0]][coords_missile[1]] == 100:
+                    print(colorer("Touché","vert"))
+                    grilleOrdi[coords_missile[0]][coords_missile[1]] = 50
+                else:
+                    print("Tu as déjà tiré ici, tu perds la boule")
+
+            # Test pour la victoire ou la défaite
+            if not detection(grilleOrdi):
+                print(colorer("BRAVO, c'est une belle victoire","bleu"))
+                return True
 
         else:
-            print("Attention on t'attaque")
-            missile = [rd.randint(0,x-1),rd.randint(0,x-1)]
-            print("Tire en ", conv_coords(missile))
+            print(colorer("Attention, l'adversaire va attaquer","jaune"))
+            barre_chargement(0.4,"•",longueur=4)
+            # On empêche l'ordinateur de tirer deux fois au même endroit
+            # On pioche le missile dans la liste puis on enlève
+            indice_missile = rd.randint(0, len(cases_possibles) - 1)
+            case_vise = cases_possibles[indice_missile]
+            print("On t'attaque en ", case_vise)
+            missile = conv_pos(cases_possibles[indice_missile])
+
+            # on enlève l'élément de la liste des possibilités
+            cases_possibles.pop(indice_missile)
+
             if grilleJ1[missile[0]][missile[1]] == 0:
                 print("Chanceux ! C'est dans la mer")
                 Tour = not Tour
             elif grilleJ1[missile[0]][missile[1]] == 100:
                 print(colorer("Tu es touché","rouge"))
-                grilleJ1[missile[0]][missile[1]] == 50
+                grilleJ1[missile[0]][missile[1]] = 50
 
-    if not detection(grilleJ1):
-        pass
+                # on restreint les possibilités de l'ordi
+                cases_possibles = intelligence_ordi(cases_possibles, case_vise, tailleJoueur, x)
+
+            affiche_quadrillage(grilleJ1)
+
+            if not detection(grilleJ1):
+                print(colorer("DEFAITE","rouge"))
+                return False
 
 
-
-bataille_navale(7,3,3)
 

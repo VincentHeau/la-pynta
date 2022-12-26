@@ -1,3 +1,6 @@
+"""
+Classe Navigateur ainsi que la classe Pirate qui est la classe du joueur du jeu
+"""
 class Navigateur(object):
 
  def __init__(self, nom, salaire=0, yeux=2, bras=2, jambes=2, argent=0, force=1, grade="minable"):
@@ -57,7 +60,6 @@ class Navigateur(object):
   self.argent+=self.salaire
   print("Salaire payé",self.salaire)
 
-
 # You is - a Navigateur
 class Pirate(Navigateur):
     def __init__(self,nom,argent,victoires,experience=0):
@@ -71,5 +73,5 @@ class Pirate(Navigateur):
      print("Victoires :",self.victoires," batailles gagnées")
      print("Grade :",self.grade)
      print("Butin :", self.argent," pièces d'or")
-     print("Salaire :",self.salaire," pièces d'or")
+     print("Expérience :", self.experience,"/ 5")
      print("Etat de santé : ",self.nbYeux,"yeux,",self.nbJambes,"jambes,",self.nbBras,"bras")
