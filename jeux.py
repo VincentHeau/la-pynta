@@ -251,6 +251,7 @@ def distanceGPS(latitude1, longitude1, latitude2, longitude2, unit='kilometers')
         return round(distance, 2)
     if unit == 'kilometers':
         return round(distance * 1.609344, 2)
+
 def colorer(message, couleur):
     """
     Fonction issue du fichier exemple.py enrichi avec la couleur jaune
@@ -460,7 +461,7 @@ def devine_les_coords(LatAtrouver,LongAtrouver, tour = 8):
         try:
             Lat, Long = float(Lat), float(Long)
             dist = distanceGPS(LatAtrouver, LongAtrouver, Lat, Long)
-            if dist<=100:
+            if dist<=200:
                 print("Bravo, tu es à moins de 100km !")
                 print("Coordonnées réelles : (",LatAtrouver,",",LongAtrouver,")")
                 return True
@@ -641,9 +642,9 @@ def bataille_navale(x, tailleJoueur,tailleOrdi):
     """
 
     # 1. Initialisation des grilles joueur et Ordi
-    print(f"Bienvenue dans la bataille navale sur un plateau ({x},{x})")
-    print("Taille du bateaux du joueur : ",tailleJoueur)
-    print("Taille du bateaux de l'adversaire : ",tailleOrdi)
+    print(f"Bienvenue dans la bataille navale sur un plateau ({x}x{x})")
+    print("Taille du bateau du joueur : ",tailleJoueur)
+    print("Taille du bateau de l'adversaire : ",tailleOrdi)
     grilleJ1 = [[0 for i in range(x)] for j in range(x)]
     grilleOrdi = [[0 for i in range(x)] for j in range(x)]
 
@@ -739,10 +740,12 @@ def bataille_navale(x, tailleJoueur,tailleOrdi):
 
     affiche_quadrillage(grilleJ1,1)
     print("Grille du joueur")
-
+    
+    """
+    #Affichage de la grille de l'ordi
     affiche_quadrillage(grilleOrdi)
     print("Grille de l'ordi")
-
+    """
 
 
     # 2. Jeu
