@@ -1,3 +1,4 @@
+import random
 import jeux
 from carthaPirates import CarthaPirates
 from equipage import buildEquipage, Equipage
@@ -11,7 +12,7 @@ if __name__ == "__main__":
     # Initialisation des paramètres de départ du jeu
     fin = False
     carthapirates = CarthaPirates(7)  # Numero du bateau LaPynta
-    carthapirates.rentrerMonBateau()  # Nettoyge préliminaire
+    carthapirates.rentrerMonBateau()  # Nettoyage préliminaire
 
     LoupsDeMer = Taverne(listeNom, listePrenom)  # taverne
     navireLaPynta = None  # navire
@@ -30,7 +31,7 @@ if __name__ == "__main__":
 
     # 1** Choix du nom du capitaine
     Nom = input("Choisis ton nom : ")
-    joueur = Pirate(Nom, argent=10, victoires=0, experience=1)
+    joueur = Pirate(Nom, argent=20, victoires=0, experience=1)
 
     print("Alors comme ça tu te lances dans la piraterie ", Nom, " ! Résumons un peu... ")
     joueur.afficheInfo()
@@ -46,7 +47,7 @@ if __name__ == "__main__":
         if MODE == 'A':
             if navireLaPynta == None or E == None:
                 print(
-                    'Il sera difficile de commencer la chance au trésor sans navire ou sans équipage, retourne à la Taverne.')
+                    'Il sera difficile de commencer la chance au trésor sans navire ou sans équipage, retourne à la Taverne ou va acheter un navire.')
             elif navireLaPynta == 'Chaloupe':
                 abandon = input(
                     "Avec une embarcation aussi maigre, l'aventure sera rude !\n Veux-tu abandonner [Oui/Non] ?")
@@ -61,7 +62,7 @@ if __name__ == "__main__":
                     print("Prouve à ton équipage que tu es un bon marin :")
                     print(
                         "Regarde la carte et évalue les coordonnées géographiques en longitude et latitude du navire.")
-                    print("Tu dois te tromper de moins de 100km et tu as 8 tentatives ")
+                    print("Tu dois te tromper de moins de 200km et tu as 8 tentatives ")
                     test1 = devine_les_coords(lat, long, 8)
 
                     if test1:
@@ -70,8 +71,17 @@ if __name__ == "__main__":
 
                         for port in ports:
                             print(port["id"], ":", port["nom"])
-                        idPortChoisi = input(colorer("Dans quel port souhaites-tu aller maintenant ? ", "rouge"))
-
+                        test2 = False
+                        while test2 == False :
+                            idPortChoisi = input(colorer("Dans quel port souhaites-tu aller maintenant ? Tape son numéro : ", "rouge"))
+                            if int(idPortChoisi) > 0 or int(idPortChoisi) < 21:
+                                test2 = True
+                            elif int(idPortChoisi) < 0 or int(idPortChoisi) > 20:
+                                print("Regarde bien les numéros, ce port n'existe pas")
+                                test2 = False
+                            else:
+                                print("Tapes le numéro du port, moussaillon !")
+                                test2 = False
                         # Pour récupérer les coordonnées d'un port, à partir de son identifiant
                         coords = carthapirates.recupererCoordsPort(idPortChoisi)  # On réutilise l'identifiant du port choisi
                         # Pour déplacer le bateau vers des coordonnées
@@ -99,7 +109,7 @@ if __name__ == "__main__":
                         else:
                             print("L'aventure s'arrête là pour toi marin d'eau douce.")
                             print(colorer(defa, "rouge"))
-                            joueur.argent = 0
+                            joueur.argent = joueur.argent-5
                             navireLaPynta = None
                     else:
                         print("L'aventure s'arrête là pour toi marin d'eau douce.")
@@ -124,7 +134,18 @@ if __name__ == "__main__":
 
                     for port in ports:
                         print(port["id"], ":", port["nom"])
-                    idPortChoisi = input(colorer("Dans quel port souhaites-tu aller maintenant ? ", "rouge"))
+                    test2 = False
+                    while test2 == False:
+                        idPortChoisi = input(
+                            colorer("Dans quel port souhaites-tu aller maintenant ? Tape son numéro : ", "rouge"))
+                        if int(idPortChoisi) > 0 or int(idPortChoisi) < 21:
+                            test2 = True
+                        elif int(idPortChoisi) < 0 or int(idPortChoisi) > 20:
+                            print("Regarde bien les numéros, ce port n'existe pas")
+                            test2 = False
+                        else:
+                            print("Tapes le numéro du port, moussaillon !")
+                            test2 = False
 
                     # Pour récupérer les coordonnées d'un port, à partir de son identifiant
                     coords = carthapirates.recupererCoordsPort(idPortChoisi)  # On réutilise l'identifiant du port choisi
@@ -206,9 +227,9 @@ if __name__ == "__main__":
                     navireLaPynta = None
 
         elif MODE == 'B':
-            biere = input("Un p'tit whisky ? [Oui/Non] ")
-            biere = biere.lower()
-            if biere == "oui":
+            whisky = input("Un p'tit whisky ? [Oui/Non] ")
+            whisky = whisky.lower()
+            if whisky == "oui":
                 if joueur.argent < 5:
                     print("Tonerre de Brest, tu vas pas nous payer tu n'as que", joueur.argent, "pièces d'or")
                     print(
@@ -230,10 +251,11 @@ if __name__ == "__main__":
 
                     elif choixTaverne == 'B':
                         nbWhisky = 0
-                        while joueur.argent >= 5:
+                        limiteWhisky = joueur.argent/2
+                        while joueur.argent >= limiteWhisky:
                             nbWhisky += 1
                             joueur.argent = joueur.argent - 5
-                        phrase = "Ivrogne, tu n'as plus un sou après "+ str(nbWhisky) + " whisky dehors ! "
+                        phrase = "Ivrogne, tu as bu "+ str(nbWhisky) + " whiskys. Sors de là avant d'être ruiné ! "
                         print(colorer(phrase, "rouge"))
                     else:
                         input(
@@ -258,6 +280,7 @@ if __name__ == "__main__":
                         navireLaPynta = type_bateau[choix_bateau]
                         joueur.argent = joueur.argent-prix[choix_bateau]
                         print("Voilà ton navire moussaillon :")
+                        print(navireLaPynta)
                         print(embarcations[navireLaPynta])
                     break
                 except (KeyError,ValueError):
@@ -315,6 +338,15 @@ if __name__ == "__main__":
                     joueur.victoires += 1
                     if joueur.experience<5:
                         joueur.experience+=1
+
+                    accidentAleatoire = random.randint(1, 3)
+                    if accidentAleatoire == 3:
+                        print("Cette victoire te coûte cher : tu as un accident")
+                        joueur.accident("jambe")
+                        joueur.afficheInfo()
+                        print("Il te manque une jambe : tu es enfin un vrai pirate ! ")
+                    else :
+                        print("Tu as de la chance, tu n'as pas été blessé")
                 else:
                     print(colorer("DEFAITE !", "rouge"))
 
@@ -328,8 +360,10 @@ if __name__ == "__main__":
             print('')
             barre_chargement(0.05,mot=" Résumé ")
             joueur.afficheInfo()
+            print("Ton navire est de la catégorie : ", navireLaPynta)
             barre_chargement(0.01)
             print('')
+
 
         elif MODE == 'F':
             # on juge le pirate et on le condamne
@@ -343,6 +377,7 @@ if __name__ == "__main__":
                 print("A. Accepter le jugement (Ton butin est de ", joueur.argent, " pièces d'or.)")
                 print("B. Echapper à la justice et tenter à nouveau sa chance dans la piraterie ")
                 choixModeD = input("Alors que fais-tu A ou B ? ")
+                choixModeD = choixModeD.upper()
                 if choixModeD == "A":
                     if joueur.argent >= 180:
                         joueur.argent = joueur.argent - 180
@@ -350,7 +385,7 @@ if __name__ == "__main__":
                             "Tu en a fini avec la justice, Veux revenir dans la piraterie ou abandonner à jamais tel un lâche ? [Oui/Non]")
                         choixModeD_revenir = choixModeD_revenir.upper()
                         if choixModeD_revenir == "NON":
-                            print('Aurevoir,en espérant te revoir bientôt dans la piraterie !')
+                            print('Au revoir,en espérant te revoir bientôt dans la piraterie !')
                             fin = True
                         elif choixModeD_revenir == "NON":
                             print('Formidable ;-)')
@@ -362,7 +397,7 @@ if __name__ == "__main__":
                         destin = pendu(jeux.liste_mot)
                         if destin:
                             print('')
-                            print('Tu as eu de la chance, ne te fais plus avoir maintenant')
+                            print('Tu as eu de la chance, ne te fais plus avoir maintenant et reste éloigné de la piraterie. Adieu !')
                         else:
                             print("Les gens se rappelleront de toi", joueur.nom, "\nAurevoir")
                             fin = True
@@ -371,7 +406,7 @@ if __name__ == "__main__":
                     print("Sage décision pirate ;)")
                 else:
                     print(
-                        "On ne t'a pas compris ! Tu étais trop occupé à t'enfuir c'est pour ça ....\n Petit coquin, bienvenue à toi")
+                        "On ne t'a pas compris ! Tu étais trop occupé à t'enfuir c'est pour ça ....\n Répète donc ton choix")
 
             if joueur.experience >= 2:
                 # jeu du pendu pour revenir au menu ou mort du personnage
@@ -388,7 +423,7 @@ if __name__ == "__main__":
                     fin = True
 
         else:
-            print("Tape A,B,C ou D, pas autre chose enfin !")
+            print("Tape A,B,C,D,E ou F, pas autre chose enfin !")
 
 
     print("Jeu LaPynta2023")
