@@ -47,4 +47,4 @@ Version finale, datant du 7 janvier 2023
 ## Auteurs
 
 * **Vincent Heau** [VincentHeau](https://gitlab.com/vincent.heau)
-* **Océane Geffroy** [lroineau](https://gitlab.com/oceane.geffroy)
+* **Océane Geffroy** [OceaneGeoffroy](https://gitlab.com/oceane.geffroy)
