@@ -1,7 +1,9 @@
+
+<img src="logo.png" height="60px" width="auto"/>
 # La Pynta
 
 Devenez le plus grand pirate de Méditerranée !
-<img src="logo.png" height="60px" width="auto"/>
+
 
 ## Jouer à la Pynta
 
