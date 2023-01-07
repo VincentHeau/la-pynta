@@ -1,5 +1,5 @@
 
-<img src="logo.png" height="60px" width="auto"/>
+<img src="logo.png" height="150px" width="auto"/>
 
 Devenez le plus grand pirate de Méditerranée !
 
