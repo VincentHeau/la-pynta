@@ -397,7 +397,7 @@ if __name__ == "__main__":
                         destin = pendu(jeux.liste_mot)
                         if destin:
                             print('')
-                            print('Tu as eu de la chance, ne te fais plus avoir maintenant et reste éloigné de la piraterie. Adieu !')
+                            print('Tu as eu de la chance, ne te fais plus avoir maintenant !')
                         else:
                             print("Les gens se rappelleront de toi", joueur.nom, "\nAurevoir")
                             fin = True
