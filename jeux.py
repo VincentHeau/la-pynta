@@ -288,56 +288,6 @@ def barre_chargement(tps=0.1, icone=colorer("■","rouge"), mot="",longueur=20):
 
     sys.stdout.write("\n")
 
-## Jeu pierre-papier-ciseaux
-# Inutile pour le moment
-def pierre_papier_ciseaux(x):
-    """
-    Jeu pierre papier ciseaux
-    :param x: int
-    En combien
-    :return: None
-    """
-
-    scoreJoueur = 0
-    scoreOrdi = 0
-    dict = {"pierre": 0, "papier": 1, "ciseaux": 2}
-    i = 0
-    SO, SA, X = [],[],[]
-
-    while ((scoreJoueur < x and scoreOrdi < x)):
-        choixJoueur = input('Tapez "pierre", "papier" ou "ciseaux" : ')
-        choixJoueur = choixJoueur.lower()
-        while choixJoueur not in dict:
-            print("ecris correctement wesh!")
-            choixJoueur = input('Tapez "pierre", "papier" ou "ciseaux"')
-            choixJoueur = choixJoueur.lower()
-
-        i += 1
-        choixJoueur = dict[choixJoueur]
-        # Choix ordi entre 0 et 2
-        choixOrdi = rd.randint(0, 2)
-        if (choixOrdi == choixJoueur):
-            print("Egalité!")
-        elif ((choixOrdi == 0 and choixJoueur == 2) or (choixOrdi == 1 and choixJoueur == 0) or (
-                choixOrdi == 2 and choixJoueur == 1)):
-            print("Ordi marque un point")
-            scoreOrdi += 1
-        else:
-            print("Joueur marque un point")
-            scoreJoueur += 1
-
-        SA.append(scoreJoueur)
-        SO.append(scoreOrdi)
-        LINE = [x for j in range(i)]
-        X.append(i)
-
-        print(f"Le joueur a {scoreJoueur} points")
-        print(f"L'ordi a {scoreOrdi} points")
-
-    # Affichage du gagnant!
-    if (scoreJoueur > scoreOrdi):
-        print("Le joueur a gagné")
-        print("L'ordi a gagné")
 
 
 ## Jeu du pendu
